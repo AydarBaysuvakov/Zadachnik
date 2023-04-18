@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Добавление задачи</h1>
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.title.label }}<br>
+        {{ form.title(class="form-control") }}<br>
+        {% for error in form.title.errors %}
+            <p class="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.description.label }}<br>
+        {{ form.description(class="form-control") }}<br>
+        {% for error in form.description.errors %}
+            <p content="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.difficult.label }}<br>
+        {{ form.difficult(class="form-control") }}<br>
+        {% for error in form.difficult.errors %}
+            <p content="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.input_description.label }}<br>
+        {{ form.input_description(class="form-control") }}<br>
+        {% for error in form.input_description.errors %}
+            <p content="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.output_description.label }}<br>
+        {{ form.output_description(class="form-control") }}<br>
+        {% for error in form.output_description.errors %}
+            <p content="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.example_input.label }}<br>
+        {{ form.example_input(class="form-control") }}<br>
+        {% for error in form.example_input.errors %}
+            <p content="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.example_output.label }}<br>
+        {{ form.example_output(class="form-control") }}<br>
+        {% for error in form.example_output.errors %}
+            <p content="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.test_input.label }}<br>
+        {{ form.test_input(class="form-control") }}<br>
+        {% for error in form.test_input.errors %}
+            <p content="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.test_output.label }}<br>
+        {{ form.test_output(class="form-control") }}<br>
+        {% for error in form.test_output.errors %}
+            <p content="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </p>
+    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+    {{message}}
+</form>
+{% endblock %}

@@ -9,5 +9,5 @@ class FavouriteAuthors(SqlAlchemyBase, SerializerMixin):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     author_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("authors.id"))
     student_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("students.id"))
-    author = orm.relationship('Authors')
+    author = orm.relationship('Author')
     student = orm.relationship('Students')

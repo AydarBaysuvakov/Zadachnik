@@ -1,3 +1,4 @@
+from . import users
 from . import problems
 from . import authors
 from . import students

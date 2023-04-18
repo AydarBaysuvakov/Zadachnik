@@ -17,5 +17,5 @@ class Problems(SqlAlchemyBase, SerializerMixin):
     author = orm.relationship('Author')
     students_that_solved = orm.relationship('SolvedProblems', back_populates='problem')
     students_that_liked = orm.relationship('FavouriteProblems', back_populates='problem')
-    tests = orm.relationship('Tests', back_populates='problem')
-    examples = orm.relationship('Examples', back_populates='problem')
+    tests = orm.relationship('Test', back_populates='problem')
+    examples = orm.relationship('Example', back_populates='problem')

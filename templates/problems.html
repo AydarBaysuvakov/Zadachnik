@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <table class="table">
+      <thead class="thead-light">
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Задача</th>
+          <th scope="col">Сложность</th>
+          <th scope="col">Решено</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in problems %}
+        <tr>
+          <th scope="row">problems.id</th>
+          <td>problems.title</td>
+          <td>problems.difficult</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+{% endblock %}
