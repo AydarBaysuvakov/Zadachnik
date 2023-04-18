@@ -13,9 +13,9 @@
       <tbody>
         {% for item in problems %}
         <tr>
-          <th scope="row">problems.id</th>
-          <td>problems.title</td>
-          <td>problems.difficult</td>
+          <th scope="row"><a href="/problem/{{item.id}}" class="link-danger">{{item.id}}</a></th>
+          <td><a href="/problem/{{item.id}}" class="link-success">{{item.title}}</a></td>
+          <td>{{item.difficult}}</td>
         </tr>
         {% endfor %}
       </tbody>

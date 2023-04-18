@@ -15,10 +15,10 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
                               index=True, unique=True, nullable=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     role = sqlalchemy.Column(sqlalchemy.String)
-    # author_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("authors.id"))
-    # student_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("students.id"))
-    author = orm.relationship('Author')
-    student = orm.relationship('Students')
+    problems = orm.relationship('Problems', back_populates='author')
+    solved_problems = orm.relationship('SolvedProblems', back_populates='student')
+    favourite_problems = orm.relationship('FavouriteProblems', back_populates='student')
+
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)

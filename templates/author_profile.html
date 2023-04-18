@@ -3,5 +3,24 @@
 {% block content %}
     <div class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0">
         <a class="btn btn-lg btn-danger" href="/add_problem">Добавить задачу</a>
-    </div>
+    </div><br>
+    <table class="table">
+      <thead class="thead-light">
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Задача</th>
+          <th scope="col">Сложность</th>
+          <th scope="col">Решено</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in problems %}
+        <tr>
+          <th scope="row">{{item.id}}</th>
+          <td>{{item.title}}</td>
+          <td>{{item.difficult}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 {% endblock %}

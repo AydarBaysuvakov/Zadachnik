@@ -7,14 +7,14 @@ class Problems(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'problems'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    author_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("authors.id"))
+    author_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
     title = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     description = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     input_description = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     output_description = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    dificult = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
+    difficult = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     rating = sqlalchemy.Column(sqlalchemy.Integer, default=100)
-    author = orm.relationship('Author')
+    author = orm.relationship('User')
     students_that_solved = orm.relationship('SolvedProblems', back_populates='problem')
     students_that_liked = orm.relationship('FavouriteProblems', back_populates='problem')
     tests = orm.relationship('Test', back_populates='problem')
