@@ -1,9 +1,13 @@
 from flask import Flask, render_template, redirect, request
 from data.users import User
 from data.problems import Problems
+from data.examples import Example
+from data.tests import Test
 from data import db_session
+from data.favourite_problems import FavouriteProblems
 from forms.user import LoginForm, RegisterForm
 from forms.problem import ProblemForm
+from forms.author import AuthorForm
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
 # Шапка программы
@@ -25,38 +29,8 @@ def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
 
-# Регистрация (Выбор роли)
-@app.route("/register")
-def register():
-    return render_template('user_role.html', title="Выбор роли")
-
-# Author(Автор)
-@app.route('/register_author', methods=['GET', 'POST'])
-def reqister_author():
-    form = RegisterForm()
-    if form.validate_on_submit():
-        if form.password.data != form.password_again.data:
-            return render_template('register.html', title='Регистрация',
-                                   form=form,
-                                   message="Пароли не совпадают")
-        db_sess = db_session.create_session()
-        if db_sess.query(User).filter(User.email == form.email.data).first():
-            return render_template('register.html', title='Регистрация',
-                                   form=form,
-                                   message="Такой пользователь уже есть")
-        user = User(
-            username=form.username.data,
-            email=form.email.data,
-            role='Автор'
-        )
-        user.set_password(form.password.data)
-        db_sess.add(user)
-        db_sess.commit()
-        return redirect('/login')
-    return render_template('register.html', title='Регистрация', form=form)
-
-# Student(Ученик)
-@app.route('/register_student', methods=['GET', 'POST'])
+# Регистрация
+@app.route('/register', methods=['GET', 'POST'])
 def reqister_student():
     form = RegisterForm()
     if form.validate_on_submit():
@@ -114,23 +88,37 @@ def problems():
 @app.route('/problem')
 def problem():
     problem_id = request.args.get('problem_id')
-    return render_template('problem.html', title=f'Задача {problem_id}', problem_id=problem_id)
+    return redirect(f'/problem/{problem_id}')
 
 # Задача ссылку
 @app.route('/problem/<int:problem_id>')
 def problem_(problem_id):
-    return render_template('problem.html', title='Задача', problem_id=problem_id)
+    db_sess = db_session.create_session()
+    problem = db_sess.query(Problems).filter(problem_id == Problems.id).first()
+    if problem:
+        return render_template('problem.html', title='Задача', problem=problem)
+    return render_template('not_exist_problem.html', title='Задача', problem_id=problem_id)
+
+# Понравилось
+@app.route('/liked/<int:problem_id>')
+def liked(problem_id):
+    db_sess = db_session.create_session()
+    fav_problem = FavouriteProblems(problem_id=problem_id, student_id=current_user.id)
+    db_sess.add(fav_problem)
+    db_sess.commit()
+    return redirect('/problems')
 
 # Личный кабинет(свой)
 @app.route('/profile')
 def profile():
-    if not current_user:
+    print(current_user.username, current_user.role)
+    if not current_user.is_authenticated:
         return redirect('/login')
     if current_user.role == 'Автор':
         db_sess = db_session.create_session()
-        problems = db_sess.query(Problems).filter(Problems.author_id == current_user.id)
-        return render_template('author_profile.html', title=current_user.username, problems=problems)
-    return render_template('student_profile.html', title=current_user.username)
+        author_problems = db_sess.query(Problems).filter(Problems.author_id == current_user.id)
+        return render_template('author_profile.html', title=current_user.username, my_problems=author_problems, solved_problems=current_user.solved_problems)
+    return render_template('student_profile.html', title=current_user.username, problems=current_user.solved_problems)
 
 # Добавление автором задачи
 @app.route('/add_problem', methods=['GET', 'POST'])
@@ -140,18 +128,45 @@ def add_problem():
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         problem = Problems()
+        # Задача
         problem.title = form.title.data
         problem.description = form.description.data
         problem.difficult = form.difficult.data
-        current_user.problems.append(problem)
+        problem.input_description = form.input_description.data
+        problem.output_description = form.output_description.data
+        # Примеры
+        example = Example(input=form.example_input.data, output=form.example_output.data)
+        problem.examples.append(example)
+        # Тесты
+        test = Test(input=form.test_input.data, output=form.test_output.data)
+        problem.tests.append(test)
+        user = db_sess.query(User).filter(User.id == current_user.id).first()
+        user.problems.append(problem)
         db_sess.merge(current_user)
         db_sess.commit()
         return redirect('/')
     return render_template('add_problem.html', title='Добавление задачи',
                            form=form)
 
+# Стать автором
+@app.route('/become_author', methods=['GET', 'POST'])
+def become_author():
+    form = AuthorForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.id == current_user.id).first()
+        if form.key.data:
+            user.role = 'Автор'
+        db_sess.commit()
+        print(current_user.username, current_user.role)
+        return redirect('/')
+    return render_template('become_author.html', title='Стать автором',
+                           form=form)
+
 # Зашли в кабинет автора(не user, по id)
 # Зашли в кабинет ученика(не user, по id)
+
+
 
 # Список авторов
 @app.route("/authors")
@@ -170,4 +185,5 @@ def main():
 
 if __name__ == '__main__':
     # main()
+
     app.run(port=8080, host='127.0.0.0')

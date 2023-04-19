@@ -8,6 +8,9 @@
           <th scope="col">Задача</th>
           <th scope="col">Сложность</th>
           <th scope="col">Решено</th>
+          {% if current_user.is_authenticated%}
+            <th scope="col">Нравится</th>
+          {% endif %}
         </tr>
       </thead>
       <tbody>
@@ -15,7 +18,11 @@
         <tr>
           <th scope="row"><a href="/problem/{{item.id}}" class="link-danger">{{item.id}}</a></th>
           <td><a href="/problem/{{item.id}}" class="link-success">{{item.title}}</a></td>
-          <td>{{item.difficult}}</td>
+          <td>{{item.difficult}}%</td>
+          <td>Solved*</td>
+          {% if current_user.is_authenticated%}
+            <td><a class="btn btn-danger rounded-pill px-3" href="/liked/{{item.id}}">+</a></td>
+          {% endif %}
         </tr>
         {% endfor %}
       </tbody>
