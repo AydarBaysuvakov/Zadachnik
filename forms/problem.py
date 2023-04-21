@@ -4,8 +4,8 @@ from wtforms.validators import DataRequired
 
 
 class ProblemForm(FlaskForm):
-    title = StringField('Название', validators=[DataRequired()])
-    description = TextAreaField('Задача', validators=[DataRequired()])
+    title = StringField('Название задачи', validators=[DataRequired()])
+    description = TextAreaField('Условие задачи', validators=[DataRequired()])
     input_description = TextAreaField('Входные данные', validators=[DataRequired()])
     output_description = TextAreaField('Выходные данные', validators=[DataRequired()])
     difficult = IntegerField('Сложность', validators=[DataRequired()])

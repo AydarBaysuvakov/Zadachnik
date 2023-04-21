@@ -22,29 +22,39 @@
             </p>
         {% endfor %}
     </p>
-    <div>
-        {{ form.difficult.label }}<br>
-        {{ form.difficult(class="form-control") }}<br>
-        {% for error in form.difficult.errors %}
-            <p content="alert alert-danger" role="alert">
-                {{ error }}
-            </p>
-        {% endfor %}
-        {{ form.time_needed.label }}<br>
-        {{ form.time_needed(class="form-control") }}<br>
-        {% for error in form.time_needed.errors %}
-            <p content="alert alert-danger" role="alert">
-                {{ error }}
-            </p>
-        {% endfor %}
-        {{ form.memory_needed.label }}<br>
-        {{ form.memory_needed(class="form-control") }}<br>
-        {% for error in form.memory_needed.errors %}
-            <p content="alert alert-danger" role="alert">
-                {{ error }}
-            </p>
-        {% endfor %}
-    </div>
+    <table>
+        <thead>
+        <tr>
+            <td>
+                <center>{{ form.difficult.label }}</center>
+                {{ form.difficult(class="form-control") }}<br>
+                {% for error in form.difficult.errors %}
+                    <p content="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+            </td>
+            <td>
+                <center>{{ form.time_needed.label }}</center>
+                {{ form.time_needed(class="form-control") }}<br>
+                {% for error in form.time_needed.errors %}
+                    <p content="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+            </td>
+            <td>
+                <center>{{ form.memory_needed.label }}</center>
+                {{ form.memory_needed(class="form-control") }}<br>
+                {% for error in form.memory_needed.errors %}
+                    <p content="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+            </td>
+        </tr>
+        </thead>
+    </table>
     <p>
         {{ form.input_description.label }}<br>
         {{ form.input_description(class="form-control") }}<br>
@@ -63,24 +73,30 @@
             </p>
         {% endfor %}
     </p>
-    <p>
-        {{ form.example_count.label }}<br>
-        {{ form.example_count(class="form-control") }}<br>
-        {% for error in form.example_count.errors %}
-            <p content="alert alert-danger" role="alert">
-                {{ error }}
-            </p>
-        {% endfor %}
-    </p>
-    <p>
-        {{ form.test_count.label }}<br>
-        {{ form.test_count(class="form-control") }}<br>
-        {% for error in form.test_count.errors %}
-            <p content="alert alert-danger" role="alert">
-                {{ error }}
-            </p>
-        {% endfor %}
-    </p>
+    <table>
+        <thead>
+        <tr>
+            <td>
+                <center>{{ form.example_count.label }}</center>
+                {{ form.example_count(class="form-control") }}<br>
+                {% for error in form.example_count.errors %}
+                    <p content="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+            </td>
+            <td>
+                <center>{{ form.test_count.label }}</center>
+                {{ form.test_count(class="form-control") }}<br>
+                {% for error in form.test_count.errors %}
+                    <p content="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+            </td>
+        </tr>
+        </thead>
+    </table>
     <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
     {{message}}
 </form>

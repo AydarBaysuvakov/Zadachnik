@@ -15,4 +15,5 @@
     {% else %}
         <p class="text-success">Для отправки решения задачи необходимо <a href="/register" class="link-success">зарегистрироваться</a> и <a href="/login" class="link-success">авторизоваться</a>!</p>
     {% endif %}
+    <p class="text-secondary">Автор задачи: <a class="link-secondary" href="/profile/{{problem.author_id}}">{{problem.author.username}}</a></p>
 {% endblock %}
