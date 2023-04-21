@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <a class="btn btn-lg btn-info" href="/become_author">Стать автором</a>
+    {% if my_profile %}
+      <a class="btn btn-lg btn-info" href="/become_author">Стать автором</a>
+    {% else %}
+      <h2>Профиль ученика {{title}}</h2>
+    {% endif %}
+    <h3 class="text-primary">Решённые задачи</h3>
     <table class="table">
       <thead class="thead-light">
         <tr>
@@ -12,11 +17,31 @@
         </tr>
       </thead>
       <tbody>
-        {% for item in problems %}
+        {% for item in solved_problems %}
         <tr>
           <th scope="row">{{item.id}}</th>
-          <td>{{item.title}}</td>
-          <td>{{item.difficult}}</td>
+          <td>{{item.problem.title}}</td>
+          <td>{{item.problem.difficult}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <h3 class="text-primary">Любимые задачи</h3>
+    <table class="table">
+      <thead class="thead-light">
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Задача</th>
+          <th scope="col">Сложность</th>
+          <th scope="col">Решено</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in fav_problems %}
+        <tr>
+          <th scope="row">{{item.id}}</th>
+          <td>{{item.problem.title}}</td>
+          <td>{{item.problem.difficult}}</td>
         </tr>
         {% endfor %}
       </tbody>

@@ -15,6 +15,8 @@ class Problems(SqlAlchemyBase, SerializerMixin):
     output_description = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     difficult = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     rating = sqlalchemy.Column(sqlalchemy.Integer, default=100)
+    example_count = sqlalchemy.Column(sqlalchemy.Integer, default=0)
+    test_count = sqlalchemy.Column(sqlalchemy.Integer, default=0)
     time_needed = sqlalchemy.Column(sqlalchemy.String, default='1 сек')
     memory_needed = sqlalchemy.Column(sqlalchemy.String, default='16 Мб')
     post_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now())

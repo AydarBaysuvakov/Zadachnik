@@ -1,5 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Тут авторы</h1>
+    <h2>Наши авторы</h2>
+    <table class="table">
+      <thead class="thead-light">
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Имя автора</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in authors %}
+        <tr>
+          <th scope="row"><a href="/profile/{{item.id}}" class="link-danger">{{item.id}}</a></th>
+          <td><a href="/profile/{{item.id}}" class="link-success">{{item.username}}</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 {% endblock %}

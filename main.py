@@ -103,22 +103,43 @@ def problem_(problem_id):
 @app.route('/liked/<int:problem_id>')
 def liked(problem_id):
     db_sess = db_session.create_session()
-    fav_problem = FavouriteProblems(problem_id=problem_id, student_id=current_user.id)
-    db_sess.add(fav_problem)
-    db_sess.commit()
+    fav_problems = db_sess.query(FavouriteProblems).filter(FavouriteProblems.student_id == current_user.id,
+                                                           FavouriteProblems.problem_id == problem_id).first()
+    if not fav_problems:
+        fav_problem = FavouriteProblems(problem_id=problem_id, student_id=current_user.id)
+        db_sess.add(fav_problem)
+        db_sess.commit()
     return redirect('/problems')
 
 # Личный кабинет(свой)
 @app.route('/profile')
-def profile():
-    print(current_user.username, current_user.role)
+def my_profile():
     if not current_user.is_authenticated:
         return redirect('/login')
     if current_user.role == 'Автор':
         db_sess = db_session.create_session()
         author_problems = db_sess.query(Problems).filter(Problems.author_id == current_user.id)
-        return render_template('author_profile.html', title=current_user.username, my_problems=author_problems, solved_problems=current_user.solved_problems)
-    return render_template('student_profile.html', title=current_user.username, problems=current_user.solved_problems)
+        return render_template('author_profile.html', title=current_user.username, my_problems=author_problems,
+                               solved_problems=current_user.solved_problems, fav_problems=current_user.favourite_problems, my_profile=True)
+    return render_template('student_profile.html', title=current_user.username,
+                           solved_problems=current_user.solved_problems, fav_problems=current_user.favourite_problems, my_profile=True)
+
+@app.route('/profile/<int:user_id>')
+def profile(user_id):
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(user_id == User.id).first()
+    if current_user.id == user.id:
+        my_profile = True
+    else:
+        my_profile = False
+    if user.role == 'Автор':
+        db_sess = db_session.create_session()
+        author_problems = db_sess.query(Problems).filter(Problems.author_id == user_id)
+        return render_template('author_profile.html', title=user.username, my_problems=author_problems,
+                               solved_problems=user.solved_problems, fav_problems=user.favourite_problems, my_profile=my_profile)
+    return render_template('student_profile.html', title=user.username,
+                           solved_problems=user.solved_problems, fav_problems=user.favourite_problems, my_profile=my_profile)
+
 
 # Добавление автором задачи
 @app.route('/add_problem', methods=['GET', 'POST'])
@@ -134,12 +155,16 @@ def add_problem():
         problem.difficult = form.difficult.data
         problem.input_description = form.input_description.data
         problem.output_description = form.output_description.data
+        problem.time_needed = form.time_needed.data
+        problem.memory_needed = form.memory_needed.data
+        problem.example_count = form.example_count.data
+        problem.test_count = form.test_count.data
         # Примеры
-        example = Example(input=form.example_input.data, output=form.example_output.data)
-        problem.examples.append(example)
+        #example = Example(input=form.example_input.data, output=form.example_output.data)
+        #problem.examples.append(example)
         # Тесты
-        test = Test(input=form.test_input.data, output=form.test_output.data)
-        problem.tests.append(test)
+        #test = Test(input=form.test_input.data, output=form.test_output.data)
+        #problem.tests.append(test)
         user = db_sess.query(User).filter(User.id == current_user.id).first()
         user.problems.append(problem)
         db_sess.merge(current_user)
@@ -158,20 +183,16 @@ def become_author():
         if form.key.data:
             user.role = 'Автор'
         db_sess.commit()
-        print(current_user.username, current_user.role)
         return redirect('/')
     return render_template('become_author.html', title='Стать автором',
                            form=form)
 
-# Зашли в кабинет автора(не user, по id)
-# Зашли в кабинет ученика(не user, по id)
-
-
-
 # Список авторов
 @app.route("/authors")
 def authors():
-    return render_template("authors.html")
+    db_sess = db_session.create_session()
+    authors = db_sess.query(User).filter(User.role == "Автор")
+    return render_template('authors.html', title='Авторы', authors=authors)
 
 # Новости
 @app.route("/news")

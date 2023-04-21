@@ -22,7 +22,7 @@
             </p>
         {% endfor %}
     </p>
-    <p>
+    <div>
         {{ form.difficult.label }}<br>
         {{ form.difficult(class="form-control") }}<br>
         {% for error in form.difficult.errors %}
@@ -30,7 +30,21 @@
                 {{ error }}
             </p>
         {% endfor %}
-    </p>
+        {{ form.time_needed.label }}<br>
+        {{ form.time_needed(class="form-control") }}<br>
+        {% for error in form.time_needed.errors %}
+            <p content="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+        {{ form.memory_needed.label }}<br>
+        {{ form.memory_needed(class="form-control") }}<br>
+        {% for error in form.memory_needed.errors %}
+            <p content="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </div>
     <p>
         {{ form.input_description.label }}<br>
         {{ form.input_description(class="form-control") }}<br>
@@ -50,36 +64,18 @@
         {% endfor %}
     </p>
     <p>
-        {{ form.example_input.label }}<br>
-        {{ form.example_input(class="form-control") }}<br>
-        {% for error in form.example_input.errors %}
+        {{ form.example_count.label }}<br>
+        {{ form.example_count(class="form-control") }}<br>
+        {% for error in form.example_count.errors %}
             <p content="alert alert-danger" role="alert">
                 {{ error }}
             </p>
         {% endfor %}
     </p>
     <p>
-        {{ form.example_output.label }}<br>
-        {{ form.example_output(class="form-control") }}<br>
-        {% for error in form.example_output.errors %}
-            <p content="alert alert-danger" role="alert">
-                {{ error }}
-            </p>
-        {% endfor %}
-    </p>
-    <p>
-        {{ form.test_input.label }}<br>
-        {{ form.test_input(class="form-control") }}<br>
-        {% for error in form.test_input.errors %}
-            <p content="alert alert-danger" role="alert">
-                {{ error }}
-            </p>
-        {% endfor %}
-    </p>
-    <p>
-        {{ form.test_output.label }}<br>
-        {{ form.test_output(class="form-control") }}<br>
-        {% for error in form.test_output.errors %}
+        {{ form.test_count.label }}<br>
+        {{ form.test_count(class="form-control") }}<br>
+        {% for error in form.test_count.errors %}
             <p content="alert alert-danger" role="alert">
                 {{ error }}
             </p>
