@@ -21,7 +21,7 @@ class Problems(SqlAlchemyBase, SerializerMixin):
     memory_needed = sqlalchemy.Column(sqlalchemy.String, default='16 Мб')
     post_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now())
     author = orm.relationship('User')
-    students_that_solved = orm.relationship('SolvedProblems', back_populates='problem')
+    students_that_solved = orm.relationship('Solvings', back_populates='problem')
     students_that_liked = orm.relationship('FavouriteProblems', back_populates='problem')
     tests = orm.relationship('Test', back_populates='problem')
     examples = orm.relationship('Example', back_populates='problem')

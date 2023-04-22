@@ -3,8 +3,8 @@ from sqlalchemy import orm
 from sqlalchemy_serializer import SerializerMixin
 from .db_session import SqlAlchemyBase
 
-class SolvedProblems(SqlAlchemyBase, SerializerMixin):
-    __tablename__ = 'solved_problems'
+class Solvings(SqlAlchemyBase, SerializerMixin):
+    __tablename__ = 'solvings'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     problem_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("problems.id"))

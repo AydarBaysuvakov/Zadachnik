@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h4>Задача №{{problem.id}}</h4><br>
+<h4 xmlns="http://www.w3.org/1999/html">Задача №{{problem.id}}</h4><br>
     <h2>{{problem.title}}</h2>
     <h6>(Время: {{problem.time_needed}} сек. Память: {{problem.memory_needed}} Мб Сложность: {{problem.difficult}}%)</h6><br>
     <h5>Условие</h5>
@@ -10,8 +10,39 @@
     <p>{{problem.input_description}}</p><br>
     <h5>Выходные данные</h5>
     <p>{{problem.output_description}}</p><br>
+    <h5>Примеры</h5>
+    <table class="table">
+        <thead>
+            <tr class="table-success">
+                <th scope="col">№</th>
+                <th scope="col">INPUT.TXT</th>
+                <th scope="col">OUTPUT.TXT</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in examples %}
+                <tr class="table-warning">
+                    <th scope="col">{{item.no}}</th>
+                    <td>{{item.input}}</td>
+                    <td>{{item.output}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     {% if current_user.is_authenticated %}
-        <p>тут скоро можно будет присылать задачи</p>
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.code.label }}<br>
+                {{ form.code(class="form-control") }}<br>
+                {% for error in form.code.errors %}
+                    <p class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+            </p>
+            <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+        </form>
     {% else %}
         <p class="text-success">Для отправки решения задачи необходимо <a href="/register" class="link-success">зарегистрироваться</a> и <a href="/login" class="link-success">авторизоваться</a>!</p>
     {% endif %}

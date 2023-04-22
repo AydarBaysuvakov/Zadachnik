@@ -16,7 +16,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     role = sqlalchemy.Column(sqlalchemy.String)
     problems = orm.relationship('Problems', back_populates='author')
-    solved_problems = orm.relationship('SolvedProblems', back_populates='student')
+    solved_problems = orm.relationship('Solvings', back_populates='student')
     favourite_problems = orm.relationship('FavouriteProblems', back_populates='student')
 
 

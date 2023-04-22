@@ -47,7 +47,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for item in problems %}
+        {% for item in solved_problems %}
         <tr>
           <th scope="row"><a href="/problem/{{item.id}}" class="link-danger">{{item.id}}</a></th>
           <td><a href="/problem/{{item.id}}" class="link-success">{{item.title}}</a></td>
@@ -77,8 +77,8 @@
       <tbody>
         {% for item in fav_problems %}
         <tr>
-          <th scope="row">{{item.problem.id}}</th>
-          <td>{{item.problem.title}}</td>
+          <th scope="row"><a href="/problem/{{item.id}}" class="link-danger">{{item.problem.id}}</a></th>
+          <td><a href="/problem/{{item.id}}" class="link-success">{{item.problem.title}}</a></td>
           <td>{{item.problem.difficult}}%</td>
           <td>Solved</td>
         </tr>

@@ -1,14 +1,17 @@
 from flask import Flask, render_template, redirect, request, abort
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from data import db_session
 from data.users import User
 from data.problems import Problems
 from data.examples import Example
 from data.tests import Test
-from data import db_session
+from data.solvings import Solvings
 from data.favourite_problems import FavouriteProblems
 from forms.user import LoginForm, RegisterForm
 from forms.problem import ProblemForm
 from forms.author import AuthorForm
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from forms.answer import AnswerForm
+
 
 # Шапка программы
 app = Flask(__name__)
@@ -92,13 +95,23 @@ def problem():
     return redirect(f'/problem/{problem_id}')
 
 # Задача
-@app.route('/problem/<int:problem_id>')
+@app.route('/problem/<int:problem_id>', methods=['GET', 'POST'])
 def problem_(problem_id):
     db_sess = db_session.create_session()
     problem = db_sess.query(Problems).filter(problem_id == Problems.id).first()
-    if problem:
-        return render_template('problem.html', title='Задача', problem=problem)
-    return render_template('not_exist_problem.html', title='Задача', problem_id=problem_id)
+    if not problem:
+        return render_template('not_exist_problem.html', title='Задача', problem_id=problem_id)
+    examples = db_sess.query(Example).filter(Example.problem_id == problem_id)
+    form = AnswerForm()
+    if form.validate_on_submit():
+        solving = Solvings()
+        solving.problem_id = problem_id
+        solving.student_id = current_user.id
+        solving.code = form.code.data
+        db_sess.add(solving)
+        db_sess.commit()
+    return render_template('problem.html', title='Задача', problem=problem, examples=examples, form=form)
+
 
 # Понравилось
 @app.route('/liked/<int:problem_id>')
@@ -171,6 +184,7 @@ def add_problem():
     return render_template('add_problem.html', title='Добавление задачи',
                            form=form)
 
+# Редактирование задачи
 @app.route('/edit_problem/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_problem(id):
@@ -213,6 +227,7 @@ def edit_problem(id):
                            title='Редактирование задачи',
                            form=form)
 
+# Удаление задачи
 @app.route('/delete_problem/<int:id>', methods=['GET', 'POST'])
 @login_required
 def problem_delete(id):
@@ -220,13 +235,21 @@ def problem_delete(id):
     problem = db_sess.query(Problems).filter(Problems.id == id,
                                       Problems.author == current_user).first()
     if problem:
+        for item in db_sess.query(Example).filter(Example.problem_id == id):
+            db_sess.delete(item)
+        for item in db_sess.query(Test).filter(Test.problem_id == id):
+            db_sess.delete(item)
+        for item in db_sess.query(FavouriteProblems).filter(FavouriteProblems.problem_id == id):
+            db_sess.delete(item)
+        for item in db_sess.query(Solvings).filter(Solvings.problem_id == id):
+            db_sess.delete(item)
         db_sess.delete(problem)
         db_sess.commit()
     else:
         abort(404)
     return redirect('/profile')
 
-
+# Примеры и тесты
 @app.route('/edit_examples_and_tests/<int:problem_id>', methods=['GET', 'POST'])
 @login_required
 def edit_examples_and_tests(problem_id):
@@ -272,7 +295,7 @@ def become_author():
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.id == current_user.id).first()
-        if form.key.data:
+        if form.key.data == '1597532486':
             user.role = 'Автор'
         db_sess.commit()
         return redirect('/')
