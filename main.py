@@ -11,6 +11,7 @@ from forms.user import LoginForm, RegisterForm
 from forms.problem import ProblemForm
 from forms.author import AuthorForm
 from forms.answer import AnswerForm
+from test_system.test import test_code
 
 
 # Шапка программы
@@ -108,6 +109,12 @@ def problem_(problem_id):
         solving.problem_id = problem_id
         solving.student_id = current_user.id
         solving.code = form.code.data
+        code = 'def main():\n\tread_f = open("test_system/INPUT.txt")\n\twrite_f = open("test_system/OUTPUT.txt", "w")\n\t' + \
+               str(solving.code).replace('\n', '\n\t').replace('input', 'read_f.readline').replace('print', 'write_f.write') + \
+            '\n\tread_f.close()\n\twrite_f.close()'
+        open('test_system/solve.py', 'w').write(code)
+        if test_code(problem_id):
+            solving.is_solved = True
         db_sess.add(solving)
         db_sess.commit()
     return render_template('problem.html', title='Задача', problem=problem, examples=examples, form=form)
