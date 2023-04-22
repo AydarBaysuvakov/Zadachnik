@@ -13,4 +13,4 @@ class ProblemForm(FlaskForm):
     memory_needed = IntegerField('Необходимая память(в МБ)', validators=[DataRequired()])
     example_count = IntegerField('Колличество примеров', validators=[DataRequired()])
     test_count = IntegerField('Колличество тестов', validators=[DataRequired()])
-    submit = SubmitField('Применить')
+    submit = SubmitField('Принять')

@@ -2,7 +2,7 @@
 
 {% block content %}
     {% if my_profile %}
-      <a class="btn btn-lg btn-info" href="/become_author">Стать автором</a>
+      <a class="btn btn-lg btn-secondary" href="/become_author">Стать автором</a>
     {% else %}
       <h2>Профиль ученика {{title}}</h2>
     {% endif %}
@@ -14,14 +14,25 @@
           <th scope="col">Задача</th>
           <th scope="col">Сложность</th>
           <th scope="col">Решено</th>
+          {% if my_profile %}
+            <th scope="col">Нравится</th>
+          {% endif %}
         </tr>
       </thead>
       <tbody>
-        {% for item in solved_problems %}
+        {% for item in problems %}
         <tr>
-          <th scope="row">{{item.id}}</th>
-          <td>{{item.problem.title}}</td>
-          <td>{{item.problem.difficult}}</td>
+          <th scope="row"><a href="/problem/{{item.id}}" class="link-danger">{{item.id}}</a></th>
+          <td><a href="/problem/{{item.id}}" class="link-success">{{item.title}}</a></td>
+          <td>{{item.difficult}}%</td>
+          <td>Solved*</td>
+          {% if my_profile %}
+            {% if item.id in fav_problems_id %}
+              <td><a class="btn btn-secondary btn-sm" href="/liked/{{item.id}}">-</a></td>
+            {% else %}
+              <td><a class="btn btn-danger btn-sm" href="/liked/{{item.id}}">+</a></td>
+            {% endif %}
+          {% endif %}
         </tr>
         {% endfor %}
       </tbody>
@@ -39,9 +50,10 @@
       <tbody>
         {% for item in fav_problems %}
         <tr>
-          <th scope="row">{{item.id}}</th>
+          <th scope="row">{{item.problem.id}}</th>
           <td>{{item.problem.title}}</td>
-          <td>{{item.problem.difficult}}</td>
+          <td>{{item.problem.difficult}}%</td>
+          <td>Solved</td>
         </tr>
         {% endfor %}
       </tbody>

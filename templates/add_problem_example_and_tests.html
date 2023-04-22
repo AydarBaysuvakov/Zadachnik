@@ -3,70 +3,45 @@
 {% block content %}
 <h1>Добавление задачи</h1>
 <form action="" method="post">
-    <h1>Примеры</h1>
+    <h2>Примеры</h2>
     <table>
         <thead>
         <tr>
             <th>Input</th>
             <th>Output</th>
-            <th></th>
         </tr>
         </thead>
-        {% for form in example_forms %}
-        {{ form.hidden_tag() }}
-        <tr>
-            <td>
-                {{ form.example_input(class="form-control") }}<br>
-                {% for error in form.example_input.errors %}
-                    <p content="alert alert-danger" role="alert">
-                        {{ error }}
-                    </p>
-                {% endfor %}
-            </td>
-            <td>
-                {{ form.example_output(class="form-control") }}<br>
-                {% for error in form.example_output.errors %}
-                    <p content="alert alert-danger" role="alert">
-                        {{ error }}
-                    </p>
-                {% endfor %}
-            </td>
-            <td>{{ form.submit(type="submit", class="btn btn-primary") }}</td>
-        </tr>
+        {% for item in example_form_count %}
+            <tr>
+                <td>
+                    <textarea name="example_input{{item}}" id="example_input{{item}}"></textarea>
+                </td>
+                <td>
+                    <textarea name="example_output{{item}}" id="example_output{{item}}"></textarea>
+                </td>
+            </tr>
         {% endfor %}
     </table>
-    <h1>Тесты</h1>
+    <h2>Тесты</h2>
     <table>
         <thead>
         <tr>
             <th>Input</th>
             <th>Output</th>
-            <th></th>
         </tr>
         </thead>
-        {% for form in test_forms %}
-        {{ form.hidden_tag() }}
-        <tr>
-            <td>
-                {{ form.test_input(class="form-control") }}<br>
-                {% for error in form.test_input.errors %}
-                    <p content="alert alert-danger" role="alert">
-                        {{ error }}
-                    </p>
-                {% endfor %}
-            </td>
-            <td>
-                {{ form.test_output(class="form-control") }}<br>
-                {% for error in form.test_output.errors %}
-                    <p content="alert alert-danger" role="alert">
-                        {{ error }}
-                    </p>
-                {% endfor %}
-            </td>
-            <td>{{ form.submit(type="submit", class="btn btn-primary") }}</td>
-        </tr>
+        {% for item in test_form_count %}
+            <tr>
+                <td>
+                    <textarea name="test_input{{item}}" id="test_input{{item}}"></textarea>
+                </td>
+                <td>
+                    <textarea name="test_output{{item}}" id="test_output{{item}}"></textarea>
+                </td>
+            </tr>
         {% endfor %}
     </table>
+    <button class="btn btn-success" type="submit">Сохранить</button>
     {{message}}
 </form>
 {% endblock %}

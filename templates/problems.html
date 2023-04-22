@@ -20,8 +20,12 @@
           <td><a href="/problem/{{item.id}}" class="link-success">{{item.title}}</a></td>
           <td>{{item.difficult}}%</td>
           <td>Solved*</td>
-          {% if current_user.is_authenticated%}
-            <td><a class="btn btn-danger rounded-pill px-3" href="/liked/{{item.id}}">+</a></td>
+          {% if current_user.is_authenticated %}
+            {% if item.id in fav_problems %}
+              <td><a class="btn btn-secondary btn-sm" href="/liked/{{item.id}}">-</a></td>
+            {% else %}
+              <td><a class="btn btn-danger btn-sm" href="/liked/{{item.id}}">+</a></td>
+            {% endif %}
           {% endif %}
         </tr>
         {% endfor %}

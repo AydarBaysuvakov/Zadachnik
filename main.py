@@ -8,7 +8,6 @@ from data.favourite_problems import FavouriteProblems
 from forms.user import LoginForm, RegisterForm
 from forms.problem import ProblemForm
 from forms.author import AuthorForm
-from forms.example_and_test import ExampleForm, TestForm
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
 # Шапка программы
@@ -83,7 +82,8 @@ def logout():
 def problems():
     db_sess = db_session.create_session()
     problems = db_sess.query(Problems)
-    return render_template('problems.html', title='Задачи', problems=problems)
+    fav_problems = [item.problem_id for item in db_sess.query(FavouriteProblems).filter(current_user.id == FavouriteProblems.student_id)]
+    return render_template('problems.html', title='Задачи', problems=problems, fav_problems=fav_problems)
 
 # Задача через поисковик
 @app.route('/problem')
@@ -91,7 +91,7 @@ def problem():
     problem_id = request.args.get('problem_id')
     return redirect(f'/problem/{problem_id}')
 
-# Задача ссылку
+# Задача
 @app.route('/problem/<int:problem_id>')
 def problem_(problem_id):
     db_sess = db_session.create_session()
@@ -109,7 +109,9 @@ def liked(problem_id):
     if not fav_problems:
         fav_problem = FavouriteProblems(problem_id=problem_id, student_id=current_user.id)
         db_sess.add(fav_problem)
-        db_sess.commit()
+    else:
+        db_sess.delete(fav_problems)
+    db_sess.commit()
     return redirect('/problems')
 
 # Личный кабинет(свой)
@@ -117,13 +119,16 @@ def liked(problem_id):
 def my_profile():
     if not current_user.is_authenticated:
         return redirect('/login')
+    db_sess = db_session.create_session()
+    fav_problems_id = [item.problem_id for item in db_sess.query(FavouriteProblems).filter(current_user.id == FavouriteProblems.student_id)]
     if current_user.role == 'Автор':
-        db_sess = db_session.create_session()
         author_problems = db_sess.query(Problems).filter(Problems.author_id == current_user.id)
         return render_template('author_profile.html', title=current_user.username, my_problems=author_problems,
-                               solved_problems=current_user.solved_problems, fav_problems=current_user.favourite_problems, my_profile=True)
+                               solved_problems=current_user.solved_problems, fav_problems=current_user.favourite_problems,
+                               my_profile=True, fav_problems_id=fav_problems_id)
     return render_template('student_profile.html', title=current_user.username,
-                           solved_problems=current_user.solved_problems, fav_problems=current_user.favourite_problems, my_profile=True)
+                           solved_problems=current_user.solved_problems, fav_problems=current_user.favourite_problems,
+                           my_profile=True, fav_problems_id=fav_problems_id)
 
 # Личный кабинет(чужой)
 @app.route('/profile/<int:user_id>')
@@ -131,16 +136,14 @@ def profile(user_id):
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(user_id == User.id).first()
     if current_user.id == user.id:
-        my_profile = True
-    else:
-        my_profile = False
+        return redirect('/profile')
     if user.role == 'Автор':
         db_sess = db_session.create_session()
         author_problems = db_sess.query(Problems).filter(Problems.author_id == user_id)
         return render_template('author_profile.html', title=user.username, my_problems=author_problems,
-                               solved_problems=user.solved_problems, fav_problems=user.favourite_problems, my_profile=my_profile)
+                               solved_problems=user.solved_problems, fav_problems=user.favourite_problems, my_profile=False)
     return render_template('student_profile.html', title=user.username,
-                           solved_problems=user.solved_problems, fav_problems=user.favourite_problems, my_profile=my_profile)
+                           solved_problems=user.solved_problems, fav_problems=user.favourite_problems, my_profile=False)
 
 
 # Добавление автором задачи
@@ -168,55 +171,99 @@ def add_problem():
     return render_template('add_problem.html', title='Добавление задачи',
                            form=form)
 
+@app.route('/edit_problem/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_problem(id):
+    form = ProblemForm()
+    if request.method == "GET":
+        db_sess = db_session.create_session()
+        problem = db_sess.query(Problems).filter(Problems.id == id,
+                                          Problems.author == current_user).first()
+        if problem:
+            form.title.data = problem.title
+            form.description.data = problem.description
+            form.difficult.data = problem.difficult
+            form.time_needed.data = problem.time_needed
+            form.memory_needed.data = problem.memory_needed
+            form.input_description.data = problem.input_description
+            form.output_description.data = problem.output_description
+            form.example_count.data = problem.example_count
+            form.test_count.data = problem.test_count
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        problem = db_sess.query(Problems).filter(Problems.id == id,
+                                          Problems.author == current_user).first()
+        if problem:
+            problem.title = form.title.data
+            problem.description = form.description.data
+            problem.difficult = form.difficult.data
+            problem.time_needed = form.time_needed.data
+            problem.memory_needed = form.memory_needed.data
+            problem.input_description = form.input_description.data
+            problem.output_description = form.output_description.data
+            problem.example_count = form.example_count.data
+            problem.test_count = form.test_count.data
+            db_sess.commit()
+            return redirect('/profile')
+        else:
+            abort(404)
+    return render_template('add_problem.html',
+                           title='Редактирование задачи',
+                           form=form)
+
+@app.route('/delete_problem/<int:id>', methods=['GET', 'POST'])
+@login_required
+def problem_delete(id):
+    db_sess = db_session.create_session()
+    problem = db_sess.query(Problems).filter(Problems.id == id,
+                                      Problems.author == current_user).first()
+    if problem:
+        db_sess.delete(problem)
+        db_sess.commit()
+    else:
+        abort(404)
+    return redirect('/profile')
+
+
 @app.route('/edit_examples_and_tests/<int:problem_id>', methods=['GET', 'POST'])
 @login_required
 def edit_examples_and_tests(problem_id):
     db_sess = db_session.create_session()
     problem = db_sess.query(Problems).filter(Problems.id == problem_id).first()
-    #if problem.author != current_user:
-    #    abort(404)
-    example_forms = [ExampleForm() for i in range(problem.example_count)]
-    test_forms = [TestForm() for i in range(problem.test_count)]
-    if request.method == "GET":
-        for form in example_forms:
-            example = db_sess.query(Example).filter(Example.problem_id == problem_id).first()
+    if problem.author.id != current_user.id:
+        abort(404)
+    if request.method == 'POST':
+        for i in range(problem.example_count):
+            example = db_sess.query(Example).filter(Example.problem_id == problem_id, Example.no == i).first()
+            input_data = request.form.get(f'example_input{i}')
+            output_data = request.form.get(f'example_output{i}')
             if example:
-                form.example_input.data = example.input
-                form.example_output.data = example.output
-        for form in test_forms:
-            test = db_sess.query(Test).filter(Test.problem_id == problem_id).first()
-            if test:
-                form.test_input.data = test.input
-                form.test_output.data = test.output
-    for form in example_forms:
-        if form.validate_on_submit():
-            example = db_sess.query(Example).filter(Example.problem_id == problem_id).first()
-            if example:
-                example.input = form.example_input.data
-                example.output = form.example_output.data
-                db_sess.commit()
+                example.input = input_data
+                example.output = output_data
             else:
-                example = Example(input=form.example_input.data, output=form.example_output.data,
-                                  problem_id=problem_id)
+                example = Example(input=input_data, output=output_data,
+                                  problem_id=problem_id, no=i)
                 db_sess.add(example)
-                db_sess.commit()
-    for form in test_forms:
-        if form.validate_on_submit():
-            test = db_sess.query(Test).filter(Test.problem_id == problem_id).first()
+            db_sess.commit()
+        for i in range(problem.test_count):
+            test = db_sess.query(Test).filter(Test.problem_id == problem_id, Test.no == i).first()
+            input_data = request.form.get(f'test_input{i}')
+            output_data = request.form.get(f'test_output{i}')
             if test:
-                test.input = form.test_input.data
-                test.output = form.test_output.data
-                db_sess.commit()
+                test.input = input_data
+                test.output = output_data
             else:
-                test = Test(input=form.test_input.data, output=form.test_output.data,
-                            problem_id=problem_id)
+                test = Test(input=input_data, output=output_data,
+                                  problem_id=problem_id, no=i)
                 db_sess.add(test)
-                db_sess.commit()
+            db_sess.commit()
+        return redirect('/profile')
     return render_template('add_problem_example_and_tests.html',
                            title='Редактирование задачи',
-                           example_forms=example_forms,
-                           test_forms=test_forms
-                           )
+                           example_form_count=range(problem.example_count),
+                           test_form_count=range(problem.test_count))
 
 # Стать автором
 @app.route('/become_author', methods=['GET', 'POST'])
@@ -251,5 +298,4 @@ def main():
 
 if __name__ == '__main__':
     # main()
-
     app.run(port=8080, host='127.0.0.0')
