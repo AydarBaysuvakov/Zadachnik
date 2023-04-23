@@ -11,7 +11,6 @@ from forms.user import LoginForm, RegisterForm
 from forms.problem import ProblemForm
 from forms.author import AuthorForm
 from forms.answer import AnswerForm
-from test_system.test import test_code
 
 
 # Шапка программы
@@ -109,12 +108,14 @@ def problem_(problem_id):
         solving.problem_id = problem_id
         solving.student_id = current_user.id
         solving.code = form.code.data
-        code = 'def main():\n\tread_f = open("test_system/INPUT.txt")\n\twrite_f = open("test_system/OUTPUT.txt", "w")\n\t' + \
-               str(solving.code).replace('\n', '\n\t').replace('input', 'read_f.readline').replace('print', 'write_f.write') + \
-            '\n\tread_f.close()\n\twrite_f.close()'
-        open('test_system/solve.py', 'w').write(code)
-        if test_code(problem_id):
+        code = open('test_system/base_code.py').read().replace('pass', str(solving.code).replace('\n', '\n    '))
+        open('test_system/code.py', 'w').write(code)
+        from test_system.test import test_code
+        result = test_code(problem_id)
+        if result[0]:
             solving.is_solved = True
+        solving.solved_tests = result[2]
+        form.message = result[1]
         db_sess.add(solving)
         db_sess.commit()
     return render_template('problem.html', title='Задача', problem=problem, examples=examples, form=form)
@@ -144,10 +145,10 @@ def my_profile():
     if current_user.role == 'Автор':
         author_problems = db_sess.query(Problems).filter(Problems.author_id == current_user.id)
         return render_template('author_profile.html', title=current_user.username, my_problems=author_problems,
-                               solved_problems=current_user.solved_problems, fav_problems=current_user.favourite_problems,
+                               solved_problems=current_user.solved_problems[:5], fav_problems=current_user.favourite_problems,
                                my_profile=True, fav_problems_id=fav_problems_id)
     return render_template('student_profile.html', title=current_user.username,
-                           solved_problems=current_user.solved_problems, fav_problems=current_user.favourite_problems,
+                           solved_problems=current_user.solved_problems[:5], fav_problems=current_user.favourite_problems,
                            my_profile=True, fav_problems_id=fav_problems_id)
 
 # Личный кабинет(чужой)
