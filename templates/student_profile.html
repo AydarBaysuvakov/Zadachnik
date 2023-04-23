@@ -14,6 +14,7 @@
           <th scope="col">Задача</th>
           <th scope="col">Сложность</th>
           <th scope="col">Решено</th>
+          <th scope="col">Тесты</th>
         </tr>
       </thead>
       <tbody>
@@ -22,7 +23,8 @@
           <th scope="row"><a href="/problem/{{item.id}}" class="link-danger">{{item.problem.id}}</a></th>
           <td><a href="/problem/{{item.id}}" class="link-success">{{item.problem.title}}</a></td>
           <td>{{item.problem.difficult}}%</td>
-          <td>Solved*</td>
+          <td>{{item.is_solved}}</td>
+          <td>{{item.solved_tests}}</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -34,7 +36,7 @@
           <th scope="col">ID</th>
           <th scope="col">Задача</th>
           <th scope="col">Сложность</th>
-          <th scope="col">Решено</th>
+            <th scope="col">Решено</th>
         </tr>
       </thead>
       <tbody>
@@ -43,7 +45,7 @@
           <th scope="row"><a href="/problem/{{item.id}}" class="link-danger">{{item.problem.id}}</a></th>
           <td><a href="/problem/{{item.id}}" class="link-success">{{item.problem.title}}</a></td>
           <td>{{item.problem.difficult}}%</td>
-          <td>Solved</td>
+            <td>{% if item.problem.id in solved %}True{% else %}False{% endif %}</td>
         </tr>
         {% endfor %}
       </tbody>

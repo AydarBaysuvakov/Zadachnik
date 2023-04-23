@@ -1,5 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Это новости</h1>
+    <h1>Последние изменения</h1>
+    {% for item in problems %}
+        <div class="shadowbox">
+            <h5>Новая задача (№{{item.id}}) от автора <a href="/profile/{{item.id}}" class="link-dark">{{item.author.username}}</a>: <a href="/problem/{{item.id}}" class="link-dark">{{item.title}}</a> </h5>
+            <p>(Время: {{item.time_needed}} сек. Память: {{item.memory_needed}} Мб Сложность: {{item.difficult}}%)</p>
+            <p class="text-secondary">{{item.post_date}}</p>
+        </div>
+    {% endfor %}
 {% endblock %}

@@ -19,11 +19,11 @@ def test_code(problem_id):
             if correct_output_s is None:
                 continue
             else:
-                return False, f'Ошибка: {E}', i
+                return False, f'Ошибка(test №{i + 1}): {E}', i
         except Exception as E:
-            return False, f'Ошибка: {E}', i
+            return False, f'Ошибка(test №{i + 1}): {E}', i
         else:
             if output_s != correct_output_s:
-                return False, f'Ошибка! Входные данные: {input_s}. Ответ программы: {output_s}. Верный ответ "{correct_output_s}"', i
+                return False, f'Ошибка(test №{i + 1})! Входные данные: {input_s}. Ответ программы: {output_s}. Верный ответ "{correct_output_s}"', i
         i += 1
     return True, 'Все тесты пройдены успешно', i

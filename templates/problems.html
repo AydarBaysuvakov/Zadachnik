@@ -19,8 +19,12 @@
           <th scope="row"><a href="/problem/{{item.id}}" class="link-danger">{{item.id}}</a></th>
           <td><a href="/problem/{{item.id}}" class="link-success">{{item.title}}</a></td>
           <td>{{item.difficult}}%</td>
-          <td>Solved*</td>
           {% if current_user.is_authenticated %}
+            {% if item.id in solved %}
+              <td>True</td>
+            {% else %}
+              <td>False</td>
+            {% endif %}
             {% if item.id in fav_problems %}
               <td><a class="btn btn-secondary btn-sm" href="/liked/{{item.id}}">-</a></td>
             {% else %}

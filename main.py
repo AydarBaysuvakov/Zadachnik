@@ -1,3 +1,5 @@
+import datetime
+
 from flask import Flask, render_template, redirect, request, abort
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data import db_session
@@ -87,7 +89,9 @@ def problems():
     db_sess = db_session.create_session()
     problems = db_sess.query(Problems)
     fav_problems = [item.problem_id for item in db_sess.query(FavouriteProblems).filter(current_user.id == FavouriteProblems.student_id)]
-    return render_template('problems.html', title='Задачи', problems=problems, fav_problems=fav_problems)
+    solved = [item.problem_id for item in
+                    db_sess.query(Solvings).filter(current_user.id == Solvings.student_id)]
+    return render_template('problems.html', title='Задачи', problems=problems, fav_problems=fav_problems, solved=solved)
 
 # Задача через поисковик
 @app.route('/problem')
@@ -142,29 +146,33 @@ def my_profile():
         return redirect('/login')
     db_sess = db_session.create_session()
     fav_problems_id = [item.problem_id for item in db_sess.query(FavouriteProblems).filter(current_user.id == FavouriteProblems.student_id)]
+    solved = [item.problem_id for item in
+              db_sess.query(Solvings).filter(current_user.id == Solvings.student_id)]
     if current_user.role == 'Автор':
         author_problems = db_sess.query(Problems).filter(Problems.author_id == current_user.id)
         return render_template('author_profile.html', title=current_user.username, my_problems=author_problems,
                                solved_problems=current_user.solved_problems[:5], fav_problems=current_user.favourite_problems,
-                               my_profile=True, fav_problems_id=fav_problems_id)
+                               my_profile=True, fav_problems_id=fav_problems_id, solved=solved)
     return render_template('student_profile.html', title=current_user.username,
                            solved_problems=current_user.solved_problems[:5], fav_problems=current_user.favourite_problems,
-                           my_profile=True, fav_problems_id=fav_problems_id)
+                           my_profile=True, fav_problems_id=fav_problems_id, solved=solved)
 
 # Личный кабинет(чужой)
 @app.route('/profile/<int:user_id>')
 def profile(user_id):
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(user_id == User.id).first()
+    solved = [item.problem_id for item in
+              db_sess.query(Solvings).filter(user.id == Solvings.student_id)]
     if current_user.id == user.id:
         return redirect('/profile')
     if user.role == 'Автор':
         db_sess = db_session.create_session()
         author_problems = db_sess.query(Problems).filter(Problems.author_id == user_id)
-        return render_template('author_profile.html', title=user.username, my_problems=author_problems,
-                               solved_problems=user.solved_problems, fav_problems=user.favourite_problems, my_profile=False)
-    return render_template('student_profile.html', title=user.username,
-                           solved_problems=user.solved_problems, fav_problems=user.favourite_problems, my_profile=False)
+        return render_template('author_profile.html', title=user.username, my_problems=author_problems, solved=solved,
+                               solved_problems=user.solved_problems[:5], fav_problems=user.favourite_problems, my_profile=False)
+    return render_template('student_profile.html', title=user.username, solved=solved,
+                           solved_problems=user.solved_problems[:5], fav_problems=user.favourite_problems, my_profile=False)
 
 
 # Добавление автором задачи
@@ -320,7 +328,9 @@ def authors():
 # Новости
 @app.route("/news")
 def news():
-    return render_template("news.html")
+    db_sess = db_session.create_session()
+    problems = db_sess.query(Problems).filter(Problems.post_date > datetime.datetime.now() - datetime.timedelta(days=1))[:5]
+    return render_template("news.html", title='Новости', problems=problems)
 
 def main():
     db_sess = db_session.create_session()
