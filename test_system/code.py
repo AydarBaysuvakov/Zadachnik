@@ -15,7 +15,10 @@ def main():
         f_write.write(text)
 
 
-    print(input() + ' ')
+    a = input()
+    print(a)
 
     f_read.close()
     f_write.close()
+
+main()

@@ -19,3 +19,5 @@ def main():
 
     f_read.close()
     f_write.close()
+
+main()

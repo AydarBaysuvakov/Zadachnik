@@ -11,6 +11,7 @@ from forms.user import LoginForm, RegisterForm
 from forms.problem import ProblemForm
 from forms.author import AuthorForm
 from forms.answer import AnswerForm
+from test_system.test import test_code
 
 
 # Шапка программы
@@ -110,7 +111,6 @@ def problem_(problem_id):
         solving.code = form.code.data
         code = open('test_system/base_code.py').read().replace('pass', str(solving.code).replace('\n', '\n    '))
         open('test_system/code.py', 'w').write(code)
-        from test_system.test import test_code
         result = test_code(problem_id)
         if result[0]:
             solving.is_solved = True

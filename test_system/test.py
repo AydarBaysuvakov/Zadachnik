@@ -11,13 +11,7 @@ def test_code(problem_id):
         f.write(input_s)
         f.close()
         try:
-            from .code import main
-            main()
-        except Exception:
-            pass
-        try:
-            from .code import main
-            main()
+            exec(open(f"test_system/code.py").read())
             f = open('test_system/OUTPUT.txt')
             output_s = f.read()
             f.close()
