@@ -109,10 +109,8 @@ def problem_(problem_id):
         solving.problem_id = problem_id
         solving.student_id = current_user.id
         solving.code = form.code.data
-        code = 'def main():\n\tread_f = open("test_system/INPUT.txt")\n\twrite_f = open("test_system/OUTPUT.txt", "w")\n\t' + \
-               str(solving.code).replace('\n', '\n\t').replace('input', 'read_f.readline').replace('print', 'write_f.write') + \
-            '\n\tread_f.close()\n\twrite_f.close()'
-        open('test_system/solve.py', 'w').write(code)
+        code = open('test_system/base_code.py').read().replace('pass', str(solving.code).replace('\n', '\n    '))
+        open('test_system/code.py', 'w').write(code)
         if test_code(problem_id):
             solving.is_solved = True
         db_sess.add(solving)

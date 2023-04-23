@@ -1,6 +1,6 @@
 from data import db_session
 from data.tests import Test
-from .solve import main
+from .code import main
 
 def test_code(problem_id):
     db_sess = db_session.create_session()
@@ -10,6 +10,10 @@ def test_code(problem_id):
         f = open('test_system/INPUT.txt', 'w')
         f.write(input_s)
         f.close()
+        try:
+            main()
+        except Exception:
+            pass
         try:
             main()
             f = open('test_system/OUTPUT.txt')

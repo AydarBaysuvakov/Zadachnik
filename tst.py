@@ -1,3 +1,3 @@
-from test_system.solve import main
+from test_system.code import main
 
 main()
