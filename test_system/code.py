@@ -15,8 +15,7 @@ def main():
         f_write.write(text)
 
 
-    a, b = map(int, input().split())
-    print(a + b)
+    print(input() + ' ')
 
     f_read.close()
     f_write.close()
