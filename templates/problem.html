@@ -30,12 +30,20 @@
         </tbody>
     </table>
     {% if current_user.is_authenticated %}
-        <form action="" method="post">
+        <form action="" method="post" enctype="multipart/form-data">
             {{ form.hidden_tag() }}
             <p>
                 {{ form.code.label }}<br>
-                {{ form.code(class="form-control") }}<br>
+                {{ form.code(class="form-control") }}
                 {% for error in form.code.errors %}
+                    <p class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.file.label }}: {{ form.file(class="form-control") }}<br>
+                {% for error in form.file.errors %}
                     <p class="alert alert-danger" role="alert">
                         {{ error }}
                     </p>
