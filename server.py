@@ -1,8 +1,7 @@
 import datetime
-
-from flask import Flask, render_template, redirect, request, abort
+from flask import Flask, render_template, redirect, request, abort, jsonify, make_response
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from data import db_session
+from data import db_session, problems_api, problems_resourses
 from data.users import User
 from data.problems import Problems
 from data.examples import Example
@@ -14,14 +13,28 @@ from forms.problem import ProblemForm
 from forms.author import AuthorForm
 from forms.answer import AnswerForm
 from test_system.test import test_code
+from flask_restful import reqparse, abort, Api, Resource
 
 
 # Шапка программы
 app = Flask(__name__)
+api = Api(app)
 app.config['SECRET_KEY'] = 'Zadachnik_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
 db_session.global_init("db/zadachnik.db")
+app.register_blueprint(problems_api.blueprint)
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(jsonify({'error': 'Not found'}), 404)
+
+
+@app.errorhandler(400)
+def bad_request(_):
+    return make_response(jsonify({'error': 'Bad Request'}), 400)
+
 
 # Главная страница
 @app.route("/")
@@ -112,7 +125,15 @@ def problem_(problem_id):
         solving = Solvings()
         solving.problem_id = problem_id
         solving.student_id = current_user.id
-        solving.code = form.code.data
+        if form.code.data:
+            solving.code = form.code.data
+        elif form.file.data:
+            file = request.files['file']
+            solving.code = file.read().decode('utf-8')
+            print(type(solving.code))
+        else:
+            form.message = 'Пожалуйста, отправьте ваше задание'
+            return render_template('problem.html', title='Задача', problem=problem, examples=examples, form=form)
         code = open('test_system/base_code.py').read().replace('pass', str(solving.code).replace('\n', '\n    '))
         open('test_system/code.py', 'w').write(code)
         result = test_code(problem_id)
@@ -339,4 +360,8 @@ def main():
 
 if __name__ == '__main__':
     # main()
+    # для списка объектов
+    api.add_resource(problems_resourses.ProblemListResource, '/api/v2/problems')
+    # для одного объекта
+    api.add_resource(problems_resourses.ProblemResource, '/api/v2/problems/<int:problem_id>')
     app.run(port=8080, host='127.0.0.0')
