@@ -102,9 +102,13 @@ def logout():
 def problems():
     db_sess = db_session.create_session()
     problems = db_sess.query(Problems)
-    fav_problems = [item.problem_id for item in db_sess.query(FavouriteProblems).filter(current_user.id == FavouriteProblems.student_id)]
-    solved = [item.problem_id for item in
-                    db_sess.query(Solvings).filter(current_user.id == Solvings.student_id)]
+    if current_user.is_authenticated:
+        fav_problems = [item.problem_id for item in db_sess.query(FavouriteProblems).filter(current_user.id == FavouriteProblems.student_id)]
+        solved = [item.problem_id for item in
+                        db_sess.query(Solvings).filter(current_user.id == Solvings.student_id)]
+    else:
+        fav_problems = []
+        solved = []
     return render_template('problems.html', title='Задачи', problems=problems, fav_problems=fav_problems, solved=solved)
 
 # Задача через поисковик
@@ -186,7 +190,7 @@ def profile(user_id):
     user = db_sess.query(User).filter(user_id == User.id).first()
     solved = [item.problem_id for item in
               db_sess.query(Solvings).filter(user.id == Solvings.student_id)]
-    if current_user.id == user.id:
+    if current_user.is_authenticated and current_user.id == user.id:
         return redirect('/profile')
     if user.role == 'Автор':
         db_sess = db_session.create_session()

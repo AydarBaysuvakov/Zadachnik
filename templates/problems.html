@@ -7,8 +7,8 @@
           <th scope="col">ID</th>
           <th scope="col">Задача</th>
           <th scope="col">Сложность</th>
-          <th scope="col">Решено</th>
           {% if current_user.is_authenticated%}
+            <th scope="col">Решено</th>
             <th scope="col">Нравится</th>
           {% endif %}
         </tr>
